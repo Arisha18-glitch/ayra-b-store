@@ -50,13 +50,5 @@ npm start
 ```
 The application will be available at `http://localhost:3000`.
 
-## 📦 Deployment (Railway)
 
-1. Push your code to GitHub.
-2. Connect your GitHub repository to [Railway.app](https://railway.app).
-3. Add the required environment variables in the Railway dashboard.
-4. Ensure your MongoDB Atlas Network Access is set to allow connections from anywhere (`0.0.0.0/0`).
-5. Deploy and access your live store!
-
----
 *Crafted for elegance and seamless shopping experiences.*
