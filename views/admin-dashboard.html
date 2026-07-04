@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Admin Dashboard — Ayra B.</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+
+<div class="notif" id="notif"></div>
+
+<!-- EDIT PRODUCT MODAL -->
+<div class="modal-over" id="editModal">
+  <div class="modal">
+    <div class="modal-h"><h3 id="modalTitle">Edit Product</h3><button class="modal-close" onclick="closeModal()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button></div>
+    <div class="fg"><label>Product Name</label><input type="text" id="mName" placeholder="e.g. Pink Floral Lawn 3-Piece"></div>
+    <div class="fg"><label>Category</label><select id="mCat"></select></div>
+    <div class="fg"><label>Sale Price</label><input type="text" id="mPrice" placeholder="Rs. 2,800"></div>
+    <div class="fg"><label>Original Price (leave empty if no discount)</label><input type="text" id="mOld" placeholder="Rs. 3,500"></div>
+    <div class="fg"><label>Badge</label><select id="mBadge"><option value="new">New Arrival</option><option value="sale">On Sale</option></select></div>
+    <div class="fg"><label>Description</label><textarea id="mDesc" placeholder="Describe the suit fabric, style, occasion..."></textarea></div>
+    <div class="fg">
+      <label>Product Images — Upload Multiple (first image is main)</label>
+      <div class="img-preview-row" id="mImgPrev"></div>
+      <div class="img-upload-area" onclick="document.getElementById('mImgInput').click()">
+        <div style="font-size:32px;margin-bottom:.5rem;color:var(--gold)">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+        </div>
+        <div style="font-size:13.5px;font-weight:700;margin-bottom:3px">Click to Upload Photos</div>
+        <div style="font-size:11.5px;color:var(--mut)">Select multiple images at once</div>
+        <input type="file" id="mImgInput" multiple accept="image/*" onchange="handleImgUpload(event)">
+      </div>
+    </div>
+    <div style="display:flex;gap:.8rem;margin-top:.8rem;flex-wrap:wrap">
+      <button class="a-save" style="flex:1" onclick="saveProduct()">Save Product</button>
+      <button class="a-save-outline" style="flex:1" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE EDIT MODAL -->
+<div class="modal-over" id="slideModal">
+  <div class="modal">
+    <div class="modal-h"><h3>Edit Slide</h3><button class="modal-close" onclick="closeSlideModal()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button></div>
+    <div class="fg"><label>Slide Title</label><input type="text" id="sTitle"></div>
+    <div class="fg"><label>Slide Description</label><textarea id="sDesc"></textarea></div>
+    <div class="fg"><label>Button Label</label><input type="text" id="sBtnTxt"></div>
+    <div class="fg"><label>Links To Category</label><select id="sCatLink"></select></div>
+    <div class="fg">
+      <label>Slide Image — Upload Your Own</label>
+      <div id="sCurImg" style="margin-bottom:.6rem"></div>
+      <div class="img-upload-area" onclick="document.getElementById('sImgIn').click()">
+        <div style="font-size:32px;margin-bottom:.5rem;color:var(--gold)">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+        </div>
+        <div style="font-size:13.5px;font-weight:700">Upload Slide Image</div>
+        <div style="font-size:11.5px;color:var(--mut)">Recommended: wide landscape photo</div>
+        <input type="file" id="sImgIn" accept="image/*" onchange="handleSlideImg(event)">
+      </div>
+    </div>
+    <button class="a-save" style="width:100%;margin-top:.6rem" onclick="saveSlide()">Save Slide</button>
+  </div>
+</div>
+
+<!-- ===== LOGIN PAGE ===== -->
+<div class="page active" id="loginPage">
+  <nav><div class="nav-wrap"><div class="logo" onclick="window.location.href='/'">Ayra <em>B.</em></div><div></div><button onclick="window.location.href='/'" style="background:var(--surf);border:1.5px solid var(--brd);padding:9px 18px;border-radius:22px;font-size:12.5px;font-weight:600;cursor:pointer">Back</button></div></nav>
+  <div class="login-wrap">
+    <div class="login-box">
+      <div class="login-ico">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold-d)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+      </div>
+      <h2>Admin Login</h2>
+      <p>Enter your admin password to access the dashboard</p>
+      <div class="l-field"><input type="password" id="pwIn" placeholder="Enter password..." onkeydown="if(event.key==='Enter')chkPw()"></div>
+      <button class="l-btn" onclick="chkPw()">Login to Admin Panel</button>
+      <div class="l-err" id="pwErr">Incorrect password. Please try again.</div>
+      <br><button class="l-back" onclick="window.location.href='/'">Back to Website</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ADMIN PAGE ===== -->
+<div class="page" id="adminPage">
+  <nav><div class="nav-wrap"><div class="logo">Ayra <em>B.</em></div><div style="font-size:12px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:1px">Admin Dashboard</div><div class="adm-top-r"><button onclick="logout()" class="a-logout">Logout</button><button onclick="window.location.href='/'" class="a-view">View Website</button></div></div></nav>
+  <div class="adm-pg">
+    <div class="adm-wrap">
+      <div class="adm-top"><h2>Dashboard</h2><div style="font-size:12.5px;color:var(--mut)">Manage your Ayra B. store</div></div>
+      <div class="adm-grid">
+        <div class="adm-sidebar">
+          <div class="a-sb-h">Admin Panel</div>
+          <div class="a-nav on" onclick="aTab(this,'tProds')">Products</div>
+          <div class="a-nav" onclick="aTab(this,'tCats')">Categories</div>
+          <div class="a-nav" onclick="aTab(this,'tSlide')">Slideshow</div>
+          <div class="a-nav" onclick="aTab(this,'tPhone')">WhatsApp</div>
+          <div class="a-nav" onclick="aTab(this,'tOffer')">Offers</div>
+          <div class="a-nav" onclick="aTab(this,'tSoc')">Social Media</div>
+          <div class="a-nav" onclick="aTab(this,'tDelivery')">Delivery</div>
+          <div class="a-nav" onclick="aTab(this,'tCommunity')">Community Photos</div>
+          <div class="a-nav" onclick="aTab(this,'tBackup')">Backup</div>
+          <div class="a-nav" onclick="aTab(this,'tPw')">Password</div>
+          <div class="a-nav" onclick="aTab(this,'tSett')">Settings</div>
+        </div>
+        <div class="adm-content">
+
+          <div class="a-panel on" id="tProds">
+            <div class="a-ph">Manage Products</div>
+            <div class="prod-mgmt-grid" id="adminProdGrid"></div>
+            <button class="a-save" onclick="openAddProduct()">Add New Product</button>
+          </div>
+
+          <div class="a-panel" id="tCats">
+            <div class="a-ph">Manage Categories</div>
+            <div class="cat-list-a" id="aCatList"></div>
+            <div style="margin-top:1.1rem">
+              <div style="font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--mut);margin-bottom:.6rem">Add New Category</div>
+              <div class="add-row"><input type="text" id="nCatName" placeholder="Category name"><input type="text" id="nCatIco" placeholder="Icon (optional)" style="max-width:120px"><button onclick="addCat()">Add</button></div>
+            </div>
+          </div>
+
+          <div class="a-panel" id="tSlide">
+            <div class="a-ph">Manage Slideshow</div>
+            <p style="font-size:13.5px;color:var(--mut);margin-bottom:1.3rem">Edit slide content and upload your own fashion photos.</p>
+            <div class="slide-admin-list" id="slideAdminList"></div>
+            <button class="a-save" onclick="openAddSlide()">Add New Slide</button>
+          </div>
+
+          <div class="a-panel" id="tPhone">
+            <div class="a-ph">WhatsApp Settings</div>
+            <div class="fg"><label>WhatsApp Number</label><input type="tel" id="aPhone" value="+92 331 7448054"></div>
+            <div class="fg"><label>Default Order Message</label><textarea id="aMsg">Hello! I'd like to place an order from Ayra B. Please share details.</textarea></div>
+            <button class="a-save" onclick="savePhone()">Save Settings</button>
+          </div>
+
+          <div class="a-panel" id="tOffer">
+            <div class="a-ph">Offer Banner</div>
+            <div class="fg"><label>Offer Text</label><input type="text" id="aOfferTxt" value="Eid Special Sale — 20% OFF on All Collections | Code: AYRA20"></div>
+            <div class="fg"><label>Banner Color</label><select id="aOfferClr"><option value="#18120E">Deep Brown (Default)</option><option value="#7A5C2E">Gold Brown</option><option value="#8B2252">Deep Rose</option><option value="#1B4D3E">Forest Green</option><option value="#1A237E">Royal Blue</option></select></div>
+            <button class="a-save" onclick="saveOffer()">Save Offer</button>
+          </div>
+
+          <div class="a-panel" id="tSoc">
+            <div class="a-ph">Social Media Links</div>
+            <div class="fg"><label>Instagram URL</label><input type="url" id="sInsta" placeholder="https://instagram.com/yourpage"></div>
+            <div class="fg"><label>Facebook URL</label><input type="url" id="sFb" placeholder="https://facebook.com/yourpage"></div>
+            <div class="fg"><label>TikTok URL</label><input type="url" id="sTt" placeholder="https://tiktok.com/@yourpage"></div>
+            <div class="fg"><label>Snapchat Username</label><input type="text" id="sSn" placeholder="@yourpage"></div>
+            <button class="a-save" onclick="saveSoc()">Save Links</button>
+          </div>
+
+          <div class="a-panel" id="tDelivery">
+            <div class="a-ph">Delivery Charges</div>
+            <p style="font-size:13.5px;color:var(--mut);margin-bottom:1.3rem">Set the flat delivery charge applied to every order in Pakistan. This amount is added to the cart total and shown to customers at checkout.</p>
+            <div class="fg">
+              <label>Delivery Charge (Rs.)</label>
+              <input type="number" id="aDelivery" placeholder="e.g. 200" min="0" step="50">
+            </div>
+            <button class="a-save" onclick="saveDelivery()">Save Delivery Charge</button>
+          </div>
+
+          <div class="a-panel" id="tCommunity">
+            <div class="a-ph">Community Section Photos</div>
+            <p style="font-size:13.5px;color:var(--mut);margin-bottom:1.3rem">Upload up to 5 photos for the "Join the Community" section on the homepage. Click any photo to replace it.</p>
+            <div id="communityPhotoGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem"></div>
+            <button class="a-save" onclick="addCommunityPhoto()">Add Photo</button>
+          </div>
+
+          <div class="a-panel" id="tBackup">
+            <div class="a-ph">Backup &amp; Restore</div>
+            <div class="backup-box">
+              <h4>Export Backup</h4>
+              <p>Download a backup file containing all your products, categories, slideshow, prices, offers and settings. Keep this file safe — you can restore it anytime, even on another device or browser.</p>
+              <div class="backup-btns"><button class="backup-btn" onclick="exportBackup()">Download Backup File</button></div>
+            </div>
+            <div class="backup-box" style="background:var(--surf);border-color:var(--brd)">
+              <h4 style="color:var(--text)">Import Backup</h4>
+              <p style="color:var(--mut)">Restore your store from a previously exported backup file (.json). This will replace all current products, categories and settings.</p>
+              <div class="backup-btns">
+                <button class="backup-btn outline" onclick="document.getElementById('importFileInput').click()">Choose Backup File</button>
+                <input type="file" id="importFileInput" class="backup-file-input" accept=".json" onchange="importBackup(event)">
+              </div>
+            </div>
+          </div>
+
+          <div class="a-panel" id="tPw">
+            <div class="a-ph">Change Password</div>
+            <div class="fg"><label>Current Password</label><input type="password" id="oPw"></div>
+            <div class="fg"><label>New Password</label><input type="password" id="nPw1"></div>
+            <div class="fg"><label>Confirm New Password</label><input type="password" id="nPw2"></div>
+            <button class="a-save" onclick="changePw()">Change Password</button>
+          </div>
+
+          <div class="a-panel" id="tSett">
+            <div class="a-ph">Website Settings</div>
+            <div class="tog-row"><span class="tog-lbl">Show Offer Banner</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="tog-row"><span class="tog-lbl">Auto-play Slideshow</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="tog-row"><span class="tog-lbl">Show Wishlist Button</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="tog-row"><span class="tog-lbl">Show Star Ratings</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="tog-row"><span class="tog-lbl">Show Social Media Section</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+            <div style="margin-top:1.6rem"><button class="a-save" onclick="notify('Settings saved!','ok')">Save Settings</button></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/js/app.js"></script>
+<script src="/js/admin-app.js"></script>
+</body>
+</html>

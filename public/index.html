@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Ayra B. | Premium Ladies Suits & Unstitched Collections</title>
+  <meta name="description" content="Discover premium Pakistani lawn, chiffon, and embroidered ladies suits at Ayra B. Shop our latest unstitched collections today.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>A</text></svg>">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="notif"></div>
+
+  <!-- OFFER BAR -->
+  <div class="offer-bar" id="offerTxt">
+    <!-- Offer text loads from app.js -->
+  </div>
+
+  <!-- HEADER / NAVIGATION -->
+  <nav>
+    <div class="nav-inner">
+      <button class="hamburger" onclick="openMobNav()" aria-label="Menu">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <div class="nav-logo" onclick="goHome()">Ayra <em>B.</em></div>
+
+      <div class="nav-links">
+        <a onclick="goHome()">Home</a>
+        <a onclick="sTo('cats')">Collections</a>
+        <a onclick="sTo('prods')">Shop</a>
+        <a onclick="goContact()">Contact Us</a>
+      </div>
+
+      <button class="nav-cart" onclick="goCart()" aria-label="Cart">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+        <span>Cart</span>
+        <div class="cart-count" id="cartBadge1" style="display:none">0</div>
+      </button>
+    </div>
+  </nav>
+
+  <!-- MOBILE NAVIGATION DRAWER -->
+  <div class="mob-overlay" id="mobOverlay"></div>
+  <div class="mob-drawer" id="mobDrawer">
+    <button class="mob-close" onclick="closeMobNav()" aria-label="Close menu">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+    <div class="mob-logo">Ayra <em>B.</em></div>
+    <div class="mob-links">
+      <a onclick="closeMobNav(); goHome()">Home</a>
+      <a onclick="closeMobNav(); sTo('cats')">Collections</a>
+      <a onclick="closeMobNav(); sTo('prods')">Shop</a>
+      <a onclick="closeMobNav(); goContact()">Contact Us</a>
+    </div>
+    
+    <div style="margin-top:2rem;">
+      <button class="sl-btn-ghost" style="color:var(--text);border-color:var(--brd);width:100%;justify-content:center" onclick="closeMobNav(); openWA('')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> 
+        WhatsApp Order
+      </button>
+    </div>
+  </div>
+
+
+  <!-- FULL CART PAGE -->
+  <main id="pgCart" class="page cart-pg">
+    <div class="cart-pg-inner">
+      <div class="cart-pg-head">
+        <button class="cart-pg-back" onclick="goHome()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          Continue Shopping
+        </button>
+        <h1>Your Cart</h1>
+        <span class="cart-pg-count" id="cartPgCount">0 items</span>
+      </div>
+
+      <div class="cart-pg-grid">
+        <!-- LEFT: Items -->
+        <div class="cart-pg-items">
+          <div id="cartPgBody"></div>
+
+          <!-- ORDER NOTES -->
+          <div class="cart-notes-box">
+            <div class="cart-notes-head">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+              Order Notes
+            </div>
+            <textarea id="orderNotes" placeholder="Add any special instructions, size preferences, or delivery notes here..."></textarea>
+          </div>
+
+          <!-- PROMO CODE -->
+          <div class="cart-promo-box">
+            <div class="cart-notes-head">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+              Promo Code
+            </div>
+            <div class="promo-row">
+              <input type="text" id="promoInput" placeholder="Enter promo code (e.g. AYRA10)">
+              <button onclick="applyPromo()">Apply</button>
+            </div>
+            <div id="promoMsg" class="promo-msg"></div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Summary -->
+        <div class="cart-pg-summary">
+          <div class="cart-sum-title">Order Summary</div>
+
+          <div class="cart-sum-row">
+            <span>Subtotal</span>
+            <span id="cpSubtotal">Rs. 0</span>
+          </div>
+          <div class="cart-sum-row" id="cpDiscountRow" style="display:none;color:#16a34a">
+            <span>Discount</span>
+            <span id="cpDiscount">- Rs. 0</span>
+          </div>
+          <div class="cart-sum-row">
+            <span>Delivery</span>
+            <span id="cpDelivery" style="color:var(--gold-d)">Rs. 200</span>
+          </div>
+          <div class="cart-sum-divider"></div>
+          <div class="cart-sum-row cart-sum-total">
+            <span>Total</span>
+            <span id="cpTotal">Rs. 0</span>
+          </div>
+
+          <button class="cart-checkout-btn" onclick="checkoutWA()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+            Send Order via WhatsApp
+          </button>
+          <div class="cart-sum-note">Your order details will be sent to us on WhatsApp. We will confirm and share payment details.</div>
+
+          <div class="cart-sum-trust">
+            <div class="trust-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              Secure & Safe
+            </div>
+            <div class="trust-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              Fast Delivery
+            </div>
+            <div class="trust-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              Easy Returns
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="cartEmptyState" style="display:none;text-align:center;padding:5rem 1rem">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--brd)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 1.5rem"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:28px;margin-bottom:.5rem">Your cart is empty</h2>
+        <p style="color:var(--mut);margin-bottom:2rem">Browse our beautiful collections and add your favourite suits.</p>
+        <button onclick="sTo('prods')" style="background:var(--deep);color:#fff;border:none;padding:14px 32px;border-radius:30px;font-size:14px;font-weight:700;cursor:pointer">Shop Now</button>
+      </div>
+    </div>
+  </main>
+
+
+
+  <!-- MAIN PAGE (HOME) -->
+  <main id="pgMain" class="page active">
+    
+    <!-- Hero Slider -->
+    <section class="slider-wrap">
+      <div class="slider-track" id="slTrack"></div>
+      <button class="sl-arrow prev" onclick="chSlide(-1)" aria-label="Previous">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <button class="sl-arrow next" onclick="chSlide(1)" aria-label="Next">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </button>
+      <div class="sl-dots" id="slDots"></div>
+    </section>
+
+    <!-- Categories -->
+    <section class="cat-sec" id="cats">
+      <div class="cat-inner">
+        <div class="sec-head">
+          <span class="sec-tag">Discover</span>
+          <h2>Shop by Collection</h2>
+          <div class="sec-div"></div>
+        </div>
+        <div class="cat-grid" id="catGrid"></div>
+      </div>
+    </section>
+
+    <!-- Products -->
+    <section class="prod-sec" id="prods">
+      <div class="prod-inner">
+        <div class="sec-head">
+          <span class="sec-tag">Our Masterpieces</span>
+          <h2>Featured Arrivals</h2>
+          <div class="sec-div"></div>
+        </div>
+        <div class="prod-grid" id="prodGrid"></div>
+      </div>
+    </section>
+
+    <!-- WhatsApp CTA -->
+    <section class="wa-cta">
+      <h2>Need help choosing?</h2>
+      <p>Our fashion consultants are available on WhatsApp to help you find the perfect suit for your next event.</p>
+      <div class="wa-phone" id="ctaPhone">+923317448054</div>
+      <button class="wa-btn-big" onclick="openWA('Consultation Request')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> 
+        Chat with us on WhatsApp
+      </button>
+    </section>
+
+  </main>
+
+  <!-- PRODUCT DETAIL PAGE -->
+  <main id="pgDetail" class="page det-page">
+    <div class="breadcrumb">
+      <div class="bc-inner">
+        <a onclick="goHome()">Home</a> &nbsp; / &nbsp; 
+        <a onclick="sTo('prods')">Shop</a> &nbsp; / &nbsp; 
+        <span id="detBread" style="color:var(--text);font-weight:600">Product Name</span>
+      </div>
+    </div>
+    
+    <div class="det-body">
+      <div class="det-imgs">
+        <img id="detMainImg" class="det-img-main" src="" alt="Product">
+        <div class="thumb-row" id="thumbRow"></div>
+      </div>
+      
+      <div class="det-info">
+        <span class="det-badge" id="detBadge"></span>
+        <h1 class="det-name" id="detName"></h1>
+        <div class="det-cat" id="detCat"></div>
+        <div class="det-rating">
+          <span class="det-stars" id="detStars"></span>
+          <span class="det-rc" id="detRc"></span>
+        </div>
+        <div class="det-price">
+          <span class="dp-cur" id="detPrice"></span>
+          <span class="dp-old" id="detOld"></span>
+        </div>
+        <p class="det-desc" id="detDesc"></p>
+        
+        <div class="det-feats" id="detFeats"></div>
+        
+        <div class="det-actions">
+          <button class="btn-det-cart" id="detCartBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+            Add to Cart
+          </button>
+          <button class="btn-det-wa" id="detWaBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+            Inquire on WhatsApp
+          </button>
+          <button class="btn-det-wa" onclick="goHome()" style="background:transparent;color:var(--text);border:1px solid var(--brd)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Back to Home
+          </button>
+        </div>
+        
+        <div class="det-meta" id="detMeta"></div>
+      </div>
+    </div>
+    
+    <div class="rev-sec">
+      <h2 class="rev-h">Customer Reviews</h2>
+      <div id="revList"></div>
+      
+      <div class="write-rev">
+        <h3>Write a Review</h3>
+        <p>Share your thoughts about this product.</p>
+        <div class="wr-group">
+          <label>Your Name</label>
+          <input type="text" id="wrName" placeholder="Enter your name">
+        </div>
+        <div class="wr-group">
+          <label>Rating</label>
+          <select id="wrRating">
+            <option value="5">5 Stars - Excellent</option>
+            <option value="4">4 Stars - Good</option>
+            <option value="3">3 Stars - Average</option>
+            <option value="2">2 Stars - Poor</option>
+            <option value="1">1 Star - Terrible</option>
+          </select>
+        </div>
+        <div class="wr-group">
+          <label>Review</label>
+          <textarea id="wrText" placeholder="What did you like or dislike?"></textarea>
+        </div>
+        <button class="wr-btn" onclick="submitReview()">Submit Review</button>
+      </div>
+    </div>
+    
+    <div class="rel-sec">
+      <div class="rel-inner">
+        <h2>You May Also Like</h2>
+        <div class="rel-grid" id="relGrid"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- CONTACT PAGE -->
+  <main id="pgContact" class="page">
+    <div class="contact-hero">
+      <h1>Get in Touch</h1>
+      <p>Have questions about our collections, sizing, or an existing order? We are here to assist you.</p>
+      <button onclick="goHome()" style="margin-top:1rem;padding:0.75rem 1.5rem;background:transparent;border:1px solid var(--gold);color:var(--gold);border-radius:2rem;cursor:pointer;font-family:var(--font);font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:0.5rem;transition:all 0.3s">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Back to Home
+      </button>
+    </div>
+    
+    <div class="contact-main">
+      <div class="contact-grid">
+        <div class="contact-info-col">
+          <h2>Contact Information</h2>
+          <p>Whether you're looking for the perfect outfit for an upcoming event or need help tracking your delivery, our team is ready to provide you with the exceptional service Ayra B. is known for.</p>
+          
+          <div class="ci-item">
+            <div class="ci-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7A5C2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+            </div>
+            <div>
+              <div class="ci-label">WhatsApp / Phone</div>
+              <div class="ci-val" id="cpPhone">+92 331 7448054</div>
+            </div>
+          </div>
+          
+          <div class="ci-item">
+            <div class="ci-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7A5C2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            </div>
+            <div>
+              <div class="ci-label">Email Support</div>
+              <div class="ci-val"><a href="mailto:info@ayrab.com">info@ayrab.com</a></div>
+            </div>
+          </div>
+          
+          <div class="ci-item">
+            <div class="ci-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7A5C2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            </div>
+            <div>
+              <div class="ci-label">Head Office</div>
+              <div class="ci-val">Lahore, Pakistan</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="contact-form">
+          <h3>Send us a Message</h3>
+          
+          <div class="cf-row">
+            <div class="cf-group">
+              <label for="cfName">Your Name</label>
+              <input type="text" id="cfName" placeholder="Jane Doe">
+            </div>
+            <div class="cf-group">
+              <label for="cfEmail">Email Address</label>
+              <input type="email" id="cfEmail" placeholder="jane@example.com">
+            </div>
+          </div>
+          
+          <div class="cf-row">
+            <div class="cf-group">
+              <label for="cfPhone">Phone Number</label>
+              <input type="text" id="cfPhone" placeholder="+92 300 0000000">
+            </div>
+            <div class="cf-group">
+              <label for="cfSubject">Subject</label>
+              <select id="cfSubject">
+                <option value="General Inquiry">General Inquiry</option>
+                <option value="Order Tracking">Order Tracking</option>
+                <option value="Product Sizing">Product Sizing</option>
+                <option value="Returns & Exchanges">Returns & Exchanges</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="cf-group">
+            <label for="cfMsg">Your Message</label>
+            <textarea id="cfMsg" placeholder="How can we help you?"></textarea>
+          </div>
+          
+          <button class="cf-submit" onclick="sendContactWA()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            Send Message
+          </button>
+          <div class="cf-note">Your message will be sent securely via WhatsApp.</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- SOCIAL BAR -->
+  <section class="soc-sec">
+    <h2>Join the Ayra B. Community</h2>
+    <p style="color:var(--mut);margin-bottom:2rem;font-size:15px">Tag us @AyraB to be featured on our page!</p>
+    
+    <div class="ig-grid" id="igGrid">
+      <!-- Loaded dynamically from settings or fallback -->
+    </div>
+
+    <div class="soc-btns">
+      <button class="soc-btn" onclick="goSoc('insta')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg> Instagram
+      </button>
+      <button class="soc-btn" onclick="goSoc('fb')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg> Facebook
+      </button>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="foot-inner">
+      <div class="foot-grid">
+        <div class="f-col">
+          <div class="f-logo">Ayra <em>B.</em></div>
+          <p class="f-desc">Redefining elegance with our premium unstitched collections. Crafted with passion, worn with pride.</p>
+          <div class="f-soc">
+            <button class="f-soc-btn" aria-label="Instagram" onclick="goSoc('insta')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+            </button>
+            <button class="f-soc-btn" aria-label="Facebook" onclick="goSoc('fb')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+            </button>
+            <button class="f-soc-btn" aria-label="TikTok" onclick="goSoc('tiktok')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg>
+            </button>
+          </div>
+        </div>
+        <div class="f-col">
+          <div class="f-col-title">Collections</div>
+          <div class="f-links">
+            <a onclick="filterCat('Lawn')">Lawn Suits</a>
+            <a onclick="filterCat('Embroidered')">Embroidered</a>
+            <a onclick="filterCat('Chiffon')">Chiffon & Silk</a>
+            <a onclick="filterCat('Winter')">Winter Wear</a>
+          </div>
+        </div>
+        <div class="f-col">
+          <div class="f-col-title">Information</div>
+          <div class="f-links">
+            <a onclick="goHome()">About Us</a>
+            <a onclick="goContact()">Contact Us</a>
+            <a onclick="goHome()">Shipping & Delivery</a>
+            <a onclick="goHome()">Returns Policy</a>
+          </div>
+        </div>
+        <div class="f-col">
+          <div class="f-col-title">Need Help?</div>
+          <div class="f-links">
+            <a onclick="openWA('')" style="color:var(--gold);font-weight:600">Order via WhatsApp</a>
+            <a id="fPhone" style="margin-bottom:10px">+92 331 7448054</a>
+            <a href="mailto:info@ayrab.com">info@ayrab.com</a>
+          </div>
+        </div>
+      </div>
+      <div class="f-bottom">
+        <div class="f-copy">&copy; 2025 Ayra B. All rights reserved.</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
