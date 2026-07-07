@@ -140,16 +140,17 @@ function renderAdminProds() {
   g.innerHTML = '';
   products.forEach(p => {
     const d = document.createElement('div');
-    d.className = 'a-pcard';
+    d.className = 'pmcard';
+    const imgSrc = (p.imgs && p.imgs.length > 0) ? p.imgs[0] : 'https://placehold.co/400x340/F5ECD9/B8935A?text=No+Image';
     d.innerHTML = `
-      <img src="${p.imgs[0]}" alt="${p.name}">
-      <div>
-        <strong>${p.name}</strong><br>
-        <small>${p.cat} | ${p.price}</small>
-      </div>
-      <div style="display:flex;gap:5px;align-items:center;margin-left:auto">
-         <button onclick="openEditProduct('${p._id}')" class="a-save" style="padding:4px 8px;font-size:12px">Edit</button>
-         <button onclick="deleteProduct('${p._id}')" class="a-save-outline" style="padding:4px 8px;font-size:12px;color:red;border-color:red">Del</button>
+      <img src="${imgSrc}" alt="${p.name}">
+      <div class="pmcard-info">
+        <div class="pmcard-name">${p.name}</div>
+        <div class="pmcard-price">${p.cat} | ${p.price}</div>
+        <div class="pmcard-btns">
+           <button onclick="openEditProduct('${p._id}')" class="pm-edit">Edit</button>
+           <button onclick="deleteProduct('${p._id}')" class="pm-del">Del</button>
+        </div>
       </div>
     `;
     g.appendChild(d);
