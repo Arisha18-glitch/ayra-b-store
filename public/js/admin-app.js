@@ -1,5 +1,7 @@
 'use strict';
 
+window.__adminDashboard = true;
+
 document.addEventListener('DOMContentLoaded', async () => {
   if (sessionStorage.getItem('ayraAdminAuth') === 'true') {
     showPage('adminPage');
@@ -13,6 +15,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 // --- AUTH ---
 async function chkPw() {
   const pw = document.getElementById('pwIn').value;
+  const btn = document.querySelector('.l-btn');
+  if(btn) { btn.disabled = true; btn.textContent = 'Logging in...'; }
   try {
     const res = await fetch('/api/settings/verify-password', {
       method: 'POST',
@@ -20,16 +24,20 @@ async function chkPw() {
       body: JSON.stringify({ password: pw })
     }).then(r => r.json());
     
-    if (res.success) {
+    if (res.success && res.authenticated) {
       sessionStorage.setItem('ayraAdminAuth', 'true');
       showPage('adminPage');
+      await fetchLiveStoreData();
       initAdmin();
     } else {
       document.getElementById('pwErr').style.display = 'block';
     }
   } catch (err) {
+    console.error('[Admin]', err);
     document.getElementById('pwErr').textContent = 'Server error. Try again.';
     document.getElementById('pwErr').style.display = 'block';
+  } finally {
+    if(btn) { btn.disabled = false; btn.textContent = 'Login to Admin Panel'; }
   }
 }
 
@@ -84,6 +92,7 @@ async function apiUpdateSetting(updates) {
     else notify(res.error || 'Failed to save', 'err');
     return res;
   } catch(e) {
+    console.error('[Admin]', e);
     notify('Network error', 'err');
   }
 }
@@ -295,6 +304,10 @@ async function saveProduct() {
   const url = editingApiId ? `/api/products/${editingApiId}` : '/api/products';
   const method = editingApiId ? 'PUT' : 'POST';
   
+  const btn = document.querySelector('#editModal .a-save');
+  const oldTxt = btn ? btn.textContent : 'Save Product';
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+
   try {
     const res = await fetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }).then(r=>r.json());
     if (res.success) {
@@ -303,7 +316,12 @@ async function saveProduct() {
       await fetchLiveStoreData(); // Refresh global state
       renderAdminProds();
     } else notify(res.error, 'err');
-  } catch(e) { notify('Error saving', 'err'); }
+  } catch(e) {
+    console.error('[Admin]', e);
+    notify('Error saving', 'err');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = oldTxt; }
+  }
 }
 
 async function deleteProduct(id) {
@@ -315,7 +333,10 @@ async function deleteProduct(id) {
       await fetchLiveStoreData();
       renderAdminProds();
     }
-  } catch(e) { notify('Error deleting', 'err'); }
+  } catch(e) {
+    console.error('[Admin]', e);
+    notify('Error deleting', 'err');
+  }
 }
 
 // --- CATEGORIES ---
@@ -323,9 +344,9 @@ function renderAdminCats() {
   const g = document.getElementById('aCatList');
   if (!g) return;
   g.innerHTML = categories.map(c => `
-    <div style="display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid var(--brd);align-items:center">
-      <div style="display:flex;gap:10px;align-items:center">
-        <img src="${catImgs[c.name] || 'https://placehold.co/50x50'}" style="width:40px;height:40px;object-fit:cover;border-radius:4px" onerror="this.src='https://placehold.co/50x50'">
+    <div class="a-cat-row" style="display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid var(--brd);align-items:center">
+      <div style="display:flex;align-items:center;gap:12px">
+        <img src="${catImgs.get(c.name) || 'https://placehold.co/50x50'}" style="width:40px;height:40px;object-fit:cover;border-radius:4px" onerror="this.src='https://placehold.co/50x50'">
         <strong>${c.name}</strong>
       </div>
       <div style="display:flex;gap:5px;">
@@ -344,8 +365,8 @@ function editCatImg(catName) {
     const f = e.target.files[0];
     if (!f) return;
     compressImage(f, async (compressedBase64) => {
-      catImgs[catName] = compressedBase64;
-      await apiUpdateSetting({ catImgs: catImgs });
+      catImgs.set(catName, compressedBase64);
+      await apiUpdateSetting({ catImgs: Object.fromEntries(catImgs) });
       renderAdminCats();
     });
   };
@@ -354,17 +375,28 @@ function editCatImg(catName) {
 async function addCat() {
   const name = document.getElementById('nCatName').value;
   if (!name) return;
+  const btn = document.querySelector('.add-row button');
+  const oldTxt = btn ? btn.textContent : 'Add';
+  if (btn) { btn.disabled = true; btn.textContent = 'Adding...'; }
   try {
     const res = await fetch('/api/categories', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({name}) }).then(r=>r.json());
     if (res.success) { notify('Category added', 'ok'); document.getElementById('nCatName').value=''; await fetchLiveStoreData(); renderAdminCats(); }
-  } catch(e) { notify('Error', 'err'); }
+  } catch(e) {
+    console.error('[Admin]', e);
+    notify('Error', 'err');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = oldTxt; }
+  }
 }
 async function deleteCat(id) {
   if(!confirm('Delete this category?')) return;
   try {
     const res = await fetch(`/api/categories/${id}`, { method: 'DELETE' }).then(r=>r.json());
     if (res.success) { notify('Deleted', 'ok'); await fetchLiveStoreData(); renderAdminCats(); }
-  } catch(e) { notify('Error', 'err'); }
+  } catch(e) {
+    console.error('[Admin]', e);
+    notify('Error', 'err');
+  }
 }
 
 // --- SLIDESHOW ---
@@ -437,14 +469,20 @@ async function saveSlide() {
   try {
     const res = await fetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }).then(r=>r.json());
     if (res.success) { notify('Slide saved!', 'ok'); closeSlideModal(); await fetchLiveStoreData(); renderAdminSlides(); }
-  } catch(e) { notify('Error', 'err'); }
+  } catch(e) {
+    console.error('[Admin]', e);
+    notify('Error', 'err');
+  }
 }
 async function deleteSlide(id) {
   if(!confirm('Delete slide?')) return;
   try {
     const res = await fetch(`/api/slides/${id}`, { method: 'DELETE' }).then(r=>r.json());
     if (res.success) { notify('Deleted', 'ok'); await fetchLiveStoreData(); renderAdminSlides(); }
-  } catch(e) { notify('Error', 'err'); }
+  } catch(e) {
+    console.error('[Admin]', e);
+    notify('Error', 'err');
+  }
 }
 
 function exportBackup() { notify('Backup functionality uses database dumps in this version.', 'info'); }

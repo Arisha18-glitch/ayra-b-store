@@ -154,7 +154,7 @@ function addToCart(id, variantLabel) {
 
 function removeFromCart(cartKey) {
   var nc = [];
-  for (var i = 0; i < cart.length; i++) { if (cart[i].cartKey !== cartKey) nc.push(cart[i]); }
+  for (var i = 0; i < cart.length; i++) { if ((cart[i].cartKey || cart[i].id) !== cartKey) nc.push(cart[i]); }
   cart = nc;
   persistCart();
   updCartUI();
@@ -162,7 +162,7 @@ function removeFromCart(cartKey) {
 
 function changeQty(cartKey, delta) {
   for (var i = 0; i < cart.length; i++) {
-    if (cart[i].cartKey === cartKey) {
+    if ((cart[i].cartKey || cart[i].id) === cartKey) {
       cart[i].qty = Math.max(1, (cart[i].qty || 1) + delta);
       break;
     }
@@ -743,7 +743,7 @@ async function fetchLiveStoreData() {
       socLinks = set.socLinks || socLinks;
       DATA.offerTxt = set.offerTxt !== undefined ? set.offerTxt : DATA.offerTxt;
       DATA.offerClr = set.offerClr !== undefined ? set.offerClr : DATA.offerClr;
-      if (set.catImgs) catImgs = set.catImgs;
+      if (set.catImgs) catImgs = new Map(Object.entries(set.catImgs));
       if (set.deliveryCharge !== undefined) deliveryCharge = set.deliveryCharge;
     }
   } catch (err) {
@@ -776,4 +776,7 @@ async function init() {
   if (mobOv) mobOv.addEventListener('click', closeMobNav);
 }
 
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.__adminDashboard) return;
+  init();
+});

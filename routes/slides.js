@@ -5,6 +5,10 @@ const router = express.Router();
 const Slide = require('../models/Slide');
 const validator = require('validator');
 
+let cache = null;
+let lastCacheTime = 0;
+const CACHE_TTL = 30000;
+
 function sanitizeString(val) {
   if (typeof val !== 'string') return '';
   return validator.escape(validator.trim(val));
@@ -12,7 +16,12 @@ function sanitizeString(val) {
 
 router.get('/', async function (req, res) {
   try {
+    if (cache && (Date.now() - lastCacheTime < CACHE_TTL)) {
+      return res.json({ success: true, data: cache });
+    }
     var slides = await Slide.find().sort({ createdAt: 1 }).lean();
+    cache = slides;
+    lastCacheTime = Date.now();
     res.json({ success: true, data: slides });
   } catch (err) {
     res.status(500).json({ success: false, error: 'Failed to retrieve slides.' });
@@ -30,6 +39,7 @@ router.post('/', async function (req, res) {
       img: req.body.img || ''
     });
     var saved = await slide.save();
+    cache = null;
     res.status(201).json({ success: true, data: saved });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });
@@ -56,6 +66,7 @@ router.put('/:id', async function (req, res) {
     if (!slide) {
       return res.status(404).json({ success: false, error: 'Slide not found.' });
     }
+    cache = null;
     res.json({ success: true, data: slide });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });
@@ -71,6 +82,7 @@ router.delete('/:id', async function (req, res) {
     if (!slide) {
       return res.status(404).json({ success: false, error: 'Slide not found.' });
     }
+    cache = null;
     res.json({ success: true, message: 'Slide deleted.' });
   } catch (err) {
     res.status(500).json({ success: false, error: 'Failed to delete slide.' });

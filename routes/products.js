@@ -5,39 +5,47 @@ const router = express.Router();
 const Product = require('../models/Product');
 const validator = require('validator');
 
+let cache = null;
+let lastCacheTime = 0;
+const CACHE_TTL = 30000;
+
 function sanitizeString(val) {
   if (typeof val !== 'string') return '';
   return validator.escape(validator.trim(val));
 }
 
-// GET all products, optional filter by category
+// GET all products
 router.get('/', async function (req, res) {
   try {
-    var filter = {};
-    if (req.query.cat && req.query.cat !== 'All') {
-      filter.cat = sanitizeString(req.query.cat);
+    if (!req.query.cat && cache && (Date.now() - lastCacheTime < CACHE_TTL)) {
+      return res.json({ success: true, count: cache.length, data: cache });
     }
-    var products = await Product.find(filter).lean();
-    products.sort((a, b) => b.createdAt - a.createdAt);
+    var filter = {};
+    if (req.query.cat && req.query.cat !== 'All') filter.cat = sanitizeString(req.query.cat);
+    var products = await Product.find(filter, {
+      name: 1, cat: 1, badge: 1, price: 1, old: 1, rating: 1, reviews: 1, stock: 1,
+      variants: 1, createdAt: 1,
+      imgs: { $slice: 1 }
+    }).sort({ createdAt: -1 }).lean();
+    if (!req.query.cat) {
+      cache = products;
+      lastCacheTime = Date.now();
+    }
     res.json({ success: true, data: products });
   } catch (err) {
-    res.status(500).json({ success: false, error: 'Failed to retrieve products.' });
+    res.status(500).json({ success: false, error: 'Failed' });
   }
 });
 
 // GET single product
 router.get('/:id', async function (req, res) {
   try {
-    if (!validator.isMongoId(req.params.id)) {
-      return res.status(400).json({ success: false, error: 'Invalid product ID.' });
-    }
+    if (!validator.isMongoId(req.params.id)) return res.status(400).json({ success: false });
     var product = await Product.findById(req.params.id).lean();
-    if (!product) {
-      return res.status(404).json({ success: false, error: 'Product not found.' });
-    }
+    if (!product) return res.status(404).json({ success: false });
     res.json({ success: true, data: product });
   } catch (err) {
-    res.status(500).json({ success: false, error: 'Failed to retrieve product.' });
+    res.status(500).json({ success: false });
   }
 });
 
@@ -61,6 +69,7 @@ router.post('/', async function (req, res) {
       variants: Array.isArray(body.variants) ? body.variants : []
     });
     var saved = await product.save();
+    cache = null;
     res.status(201).json({ success: true, data: saved });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });
@@ -70,9 +79,7 @@ router.post('/', async function (req, res) {
 // PUT update product
 router.put('/:id', async function (req, res) {
   try {
-    if (!validator.isMongoId(req.params.id)) {
-      return res.status(400).json({ success: false, error: 'Invalid product ID.' });
-    }
+    if (!validator.isMongoId(req.params.id)) return res.status(400).json({ success: false });
     var body = req.body;
     var updates = {};
     if (body.name !== undefined) updates.name = sanitizeString(body.name);
@@ -91,9 +98,8 @@ router.put('/:id', async function (req, res) {
       new: true,
       runValidators: true
     });
-    if (!product) {
-      return res.status(404).json({ success: false, error: 'Product not found.' });
-    }
+    if (!product) return res.status(404).json({ success: false });
+    cache = null;
     res.json({ success: true, data: product });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });
@@ -103,16 +109,13 @@ router.put('/:id', async function (req, res) {
 // DELETE product
 router.delete('/:id', async function (req, res) {
   try {
-    if (!validator.isMongoId(req.params.id)) {
-      return res.status(400).json({ success: false, error: 'Invalid product ID.' });
-    }
+    if (!validator.isMongoId(req.params.id)) return res.status(400).json({ success: false });
     var product = await Product.findByIdAndDelete(req.params.id);
-    if (!product) {
-      return res.status(404).json({ success: false, error: 'Product not found.' });
-    }
+    if (!product) return res.status(404).json({ success: false });
+    cache = null;
     res.json({ success: true, message: 'Product deleted.' });
   } catch (err) {
-    res.status(500).json({ success: false, error: 'Failed to delete product.' });
+    res.status(500).json({ success: false });
   }
 });
 

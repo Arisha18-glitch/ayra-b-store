@@ -5,6 +5,10 @@ const router = express.Router();
 const Category = require('../models/Category');
 const validator = require('validator');
 
+let cache = null;
+let lastCacheTime = 0;
+const CACHE_TTL = 30000;
+
 function sanitizeString(val) {
   if (typeof val !== 'string') return '';
   return validator.escape(validator.trim(val));
@@ -12,7 +16,12 @@ function sanitizeString(val) {
 
 router.get('/', async function (req, res) {
   try {
+    if (cache && (Date.now() - lastCacheTime < CACHE_TTL)) {
+      return res.json({ success: true, data: cache });
+    }
     var categories = await Category.find().sort({ createdAt: 1 }).lean();
+    cache = categories;
+    lastCacheTime = Date.now();
     res.json({ success: true, data: categories });
   } catch (err) {
     res.status(500).json({ success: false, error: 'Failed to retrieve categories.' });
@@ -27,6 +36,7 @@ router.post('/', async function (req, res) {
       count: parseInt(req.body.count, 10) || 0
     });
     var saved = await cat.save();
+    cache = null;
     res.status(201).json({ success: true, data: saved });
   } catch (err) {
     if (err.code === 11000) {
@@ -45,6 +55,7 @@ router.delete('/:id', async function (req, res) {
     if (!cat) {
       return res.status(404).json({ success: false, error: 'Category not found.' });
     }
+    cache = null;
     res.json({ success: true, message: 'Category deleted.' });
   } catch (err) {
     res.status(500).json({ success: false, error: 'Failed to delete category.' });
