@@ -20,7 +20,7 @@ router.get('/', async function (req, res) {
     var products = await Product.find(filter).sort({ createdAt: -1 }).lean();
     res.json({ success: true, data: products });
   } catch (err) {
-    res.status(500).json({ success: false, error: 'Failed to retrieve products.', details: err.message, stack: err.stack });
+    res.status(500).json({ success: false, error: 'Failed to retrieve products.' });
   }
 });
 
