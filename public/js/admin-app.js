@@ -52,7 +52,6 @@ function initAdmin() {
   renderAdminProds();
   renderAdminCats();
   renderAdminSlides();
-  renderCommunityAdmin();
   populateSettings();
 }
 
@@ -388,46 +387,4 @@ async function deleteSlide(id) {
 function exportBackup() { notify('Backup functionality uses database dumps in this version.', 'info'); }
 function importBackup() { notify('Restore functionality uses database dumps in this version.', 'info'); }
 
-// --- COMMUNITY PHOTOS ---
-function renderCommunityAdmin() {
-  const grid = document.getElementById('communityPhotoGrid');
-  if (!grid) return;
-  const imgs = communityImgs && communityImgs.length > 0 ? communityImgs : [];
-  if (imgs.length === 0) {
-    grid.innerHTML = '<p style="color:var(--mut);font-size:13px">No photos added yet. Click "Add Photo" to upload your first community photo.</p>';
-    return;
-  }
-  grid.innerHTML = imgs.map((src, i) => `
-    <div style="position:relative;border-radius:8px;overflow:hidden">
-      <img src="${src}" style="width:100%;aspect-ratio:1/1;object-fit:cover" onerror="this.src='https://placehold.co/150x150'">
-      <button onclick="deleteCommunityPhoto(${i})" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:14px;line-height:24px">×</button>
-    </div>
-  `).join('');
-}
 
-function addCommunityPhoto() {
-  if (communityImgs && communityImgs.length >= 5) { notify('Max 5 photos allowed. Delete one first.', 'err'); return; }
-  const input = document.createElement('input');
-  input.type = 'file'; input.accept = 'image/*';
-  input.onchange = (e) => {
-    const f = e.target.files[0];
-    if (!f) return;
-    const r = new FileReader();
-    r.onload = async (ev) => {
-      if (!communityImgs) communityImgs = [];
-      communityImgs.push(ev.target.result);
-      await apiUpdateSetting({ communityImgs: communityImgs });
-      renderCommunityAdmin();
-    };
-    r.readAsDataURL(f);
-  };
-  input.click();
-}
-
-async function deleteCommunityPhoto(index) {
-  if (!confirm('Remove this photo?')) return;
-  communityImgs.splice(index, 1);
-  await apiUpdateSetting({ communityImgs: communityImgs });
-  renderCommunityAdmin();
-  notify('Photo removed', 'ok');
-}

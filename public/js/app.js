@@ -68,7 +68,6 @@ var editingSlideIdx = null;
 var tempImgs    = [];
 var currentDetailId = null;
 var deliveryCharge  = 200;
-var communityImgs   = [];
 var promoDiscount   = 0;   // Rs. discount applied
 var promoCode       = '';  // active promo code
 // Valid promo codes: code -> percent off
@@ -208,11 +207,11 @@ function updCartUI() {
       '</div>' +
       '<div class="cp-item-right">' +
         '<div class="qty-ctrl">' +
-          '<button class="qty-btn" onclick="changeQty(' + c.id + ',-1)">−</button>' +
+          '<button class="qty-btn" onclick="changeQty(\'' + c.id + '\',-1)">−</button>' +
           '<div class="qty-num">' + c.qty + '</div>' +
-          '<button class="qty-btn" onclick="changeQty(' + c.id + ',1)">+</button>' +
+          '<button class="qty-btn" onclick="changeQty(\'' + c.id + '\',1)">+</button>' +
         '</div>' +
-        '<button class="cp-remove" onclick="removeFromCart(' + c.id + ')">' +
+        '<button class="cp-remove" onclick="removeFromCart(\'' + c.id + '\')">' +
           '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4h6v2"></path></svg>' +
           ' Remove' +
         '</button>' +
@@ -261,6 +260,7 @@ function checkoutWA() {
   if (notes) msg += '\n*Order Notes:* ' + notes + '\n';
   msg += '\nPlease confirm and share delivery details.\n\nThank you for shopping at *Ayra B.*!';
   window.open('https://wa.me/' + waPhone + '?text=' + encodeURIComponent(msg), '_blank');
+  cart = []; persistCart(); updCartUI();
 }
 
 function applyPromo() {
@@ -357,9 +357,7 @@ function updSlide() {
 
 function catKeyFor(name) {
   if (name === 'All Suits') return 'All';
-  if (name.indexOf('Chiffon') > -1) return 'Chiffon';
-  if (name.indexOf('Formal') > -1) return 'Formal';
-  return name.split(' ')[0];
+  return name;
 }
 
 function renderProds(filter) {
@@ -403,7 +401,7 @@ function renderCats() {
   g.innerHTML = '';
   categories.forEach(function(c) {
     var key = catKeyFor(c.name);
-    var img = catImgs[c.name] || 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=500&q=85';
+    var img = catImgs[c.name] || 'https://placehold.co/300x280/F5ECD9/B8935A?text=Category';
     var d = document.createElement('div');
     d.className = 'cat-tile';
     d.innerHTML =
@@ -447,11 +445,15 @@ function openDetail(id) {
   document.getElementById('detDesc').textContent  = p.desc;
 
   var featsHtml = '';
-  p.features.forEach(function(f) { featsHtml += '<div class="det-feat"><div class="feat-dot"></div>' + f + '</div>'; });
+  if (p.features && Array.isArray(p.features)) {
+    p.features.forEach(function(f) { featsHtml += '<div class="det-feat"><div class="feat-dot"></div>' + f + '</div>'; });
+  }
   document.getElementById('detFeats').innerHTML = featsHtml;
 
   var metaHtml = '';
-  for (var k in p.meta) { if (p.meta.hasOwnProperty(k)) metaHtml += '<div class="dm"><span>' + k + '</span><strong>' + p.meta[k] + '</strong></div>'; }
+  if (p.meta) {
+    for (var k in p.meta) { if (p.meta.hasOwnProperty(k)) metaHtml += '<div class="dm"><span>' + k + '</span><strong>' + p.meta[k] + '</strong></div>'; }
+  }
   document.getElementById('detMeta').innerHTML = metaHtml;
 
   var mi = document.getElementById('detMainImg');
@@ -627,7 +629,6 @@ async function fetchLiveStoreData() {
       DATA.offerClr = set.offerClr !== undefined ? set.offerClr : DATA.offerClr;
       if (set.catImgs) catImgs = set.catImgs;
       if (set.deliveryCharge !== undefined) deliveryCharge = set.deliveryCharge;
-      if (set.communityImgs && set.communityImgs.length > 0) communityImgs = set.communityImgs;
     }
   } catch (err) {
     console.warn('Failed to load live data, using fallback.', err);
@@ -640,7 +641,6 @@ async function init() {
   buildSlider();
   renderProds();
   renderCats();
-  renderCommunityGrid();
   updCartBadge();
 
   // Set phone numbers
@@ -661,19 +661,3 @@ async function init() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
-
-function renderCommunityGrid() {
-  var grid = document.getElementById('igGrid');
-  if (!grid) return;
-  var fallback = [
-    'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=300&h=300&fit=crop',
-    'https://images.unsplash.com/photo-1594938298603-c8148c4b4057?w=300&h=300&fit=crop',
-    'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=300&h=300&fit=crop',
-    'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=300&h=300&fit=crop',
-    'https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=300&h=300&fit=crop'
-  ];
-  var imgs = (communityImgs && communityImgs.length > 0) ? communityImgs : fallback;
-  grid.innerHTML = imgs.slice(0, 5).map(function(src, i) {
-    return '<img src="' + src + '" alt="Community ' + (i+1) + '" loading="lazy"' + (i === 4 ? ' class="hide-mob"' : '') + '>';
-  }).join('');
-}
