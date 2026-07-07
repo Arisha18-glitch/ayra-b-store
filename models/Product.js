@@ -63,6 +63,20 @@ const productSchema = new mongoose.Schema({
     type: Map,
     of: String,
     default: {}
+  },
+  variants: {
+    type: [{
+      size: String,
+      color: String,
+      price: String,
+      stock: { type: Number, default: 0 }
+    }],
+    default: []
+  },
+  stock: {
+    type: Number,
+    default: 10,
+    min: 0
   }
 }, {
   timestamps: true,

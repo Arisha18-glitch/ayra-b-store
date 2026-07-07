@@ -22,6 +22,12 @@
     <div class="fg"><label>Sale Price</label><input type="text" id="mPrice" placeholder="Rs. 2,800"></div>
     <div class="fg"><label>Original Price (leave empty if no discount)</label><input type="text" id="mOld" placeholder="Rs. 3,500"></div>
     <div class="fg"><label>Badge</label><select id="mBadge"><option value="new">New Arrival</option><option value="sale">On Sale</option></select></div>
+    <div class="fg"><label>Stock (if no variants)</label><input type="number" id="mStock" placeholder="10" min="0"></div>
+    <div class="fg">
+      <label>Variants (Size/Color/Price Override/Stock)</label>
+      <div id="mVariantsList" style="margin-bottom:8px;display:flex;flex-direction:column;gap:5px;"></div>
+      <button class="a-save-outline" style="width:100%" onclick="addVariantRow()">+ Add Variant</button>
+    </div>
     <div class="fg"><label>Description</label><textarea id="mDesc" placeholder="Describe the suit fabric, style, occasion..."></textarea></div>
     <div class="fg">
       <label>Product Images — Upload Multiple (first image is main)</label>

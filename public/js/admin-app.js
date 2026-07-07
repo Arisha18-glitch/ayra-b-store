@@ -164,8 +164,11 @@ function openAddProduct() {
   document.getElementById('mPrice').value = '';
   document.getElementById('mOld').value = '';
   document.getElementById('mDesc').value = '';
+  document.getElementById('mStock').value = 10;
   tempImgs = [];
+  tempVariants = [];
   renderTempImgs();
+  renderVariants();
   
   const mCat = document.getElementById('mCat');
   mCat.innerHTML = categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
@@ -183,12 +186,15 @@ function openEditProduct(id) {
   document.getElementById('mOld').value = p.old || '';
   document.getElementById('mDesc').value = p.desc;
   document.getElementById('mBadge').value = p.badge;
+  document.getElementById('mStock').value = p.stock !== undefined ? p.stock : 10;
   
   const mCat = document.getElementById('mCat');
   mCat.innerHTML = categories.map(c => `<option value="${c.name}" ${c.name === p.cat ? 'selected' : ''}>${c.name}</option>`).join('');
   
   tempImgs = [...p.imgs];
+  tempVariants = p.variants ? JSON.parse(JSON.stringify(p.variants)) : [];
   renderTempImgs();
+  renderVariants();
   document.getElementById('editModal').classList.add('open');
 }
 
@@ -196,13 +202,69 @@ function closeModal() {
   document.getElementById('editModal').classList.remove('open');
 }
 
+let tempVariants = [];
+
+function addVariantRow() {
+  tempVariants.push({ size: '', color: '', price: '', stock: 0 });
+  renderVariants();
+}
+
+function updateVariant(index, field, value) {
+  if(field === 'stock') value = parseInt(value, 10) || 0;
+  tempVariants[index][field] = value;
+}
+
+function removeVariant(index) {
+  tempVariants.splice(index, 1);
+  renderVariants();
+}
+
+function renderVariants() {
+  const container = document.getElementById('mVariantsList');
+  if(!container) return;
+  container.innerHTML = tempVariants.map((v, i) => `
+    <div style="display:flex;gap:5px;align-items:center;">
+      <input type="text" placeholder="Size (e.g. M)" value="${v.size || ''}" onchange="updateVariant(${i}, 'size', this.value)" style="flex:1">
+      <input type="text" placeholder="Color" value="${v.color || ''}" onchange="updateVariant(${i}, 'color', this.value)" style="flex:1">
+      <input type="text" placeholder="Price" value="${v.price || ''}" onchange="updateVariant(${i}, 'price', this.value)" style="flex:1">
+      <input type="number" placeholder="Stock" value="${v.stock || 0}" onchange="updateVariant(${i}, 'stock', this.value)" style="width:60px">
+      <button onclick="removeVariant(${i})" style="color:red;border:none;background:none;cursor:pointer;font-size:16px;">×</button>
+    </div>
+  `).join('');
+}
+
+function compressImage(file, callback) {
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = event => {
+    const img = new Image();
+    img.src = event.target.result;
+    img.onload = () => {
+      const MAX_WIDTH = 800;
+      let width = img.width;
+      let height = img.height;
+      if (width > MAX_WIDTH) {
+        height = Math.round((height *= MAX_WIDTH / width));
+        width = MAX_WIDTH;
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      callback(canvas.toDataURL('image/jpeg', 0.7));
+    };
+  };
+}
+
 function handleImgUpload(e) {
   const files = e.target.files;
   if (!files) return;
   for (let i=0; i<files.length; i++) {
-    const r = new FileReader();
-    r.onload = ev => { tempImgs.push(ev.target.result); renderTempImgs(); };
-    r.readAsDataURL(files[i]);
+    compressImage(files[i], (compressedBase64) => {
+      tempImgs.push(compressedBase64);
+      renderTempImgs();
+    });
   }
 }
 function renderTempImgs() {
@@ -224,6 +286,8 @@ async function saveProduct() {
     old: document.getElementById('mOld').value,
     badge: document.getElementById('mBadge').value,
     desc: document.getElementById('mDesc').value,
+    stock: document.getElementById('mStock').value,
+    variants: tempVariants,
     imgs: tempImgs
   };
   
@@ -278,14 +342,11 @@ function editCatImg(catName) {
   input.onchange = (e) => {
     const f = e.target.files[0];
     if (!f) return;
-    const r = new FileReader();
-    r.onload = async (ev) => {
-      const base64 = ev.target.result;
-      catImgs[catName] = base64;
+    compressImage(f, async (compressedBase64) => {
+      catImgs[catName] = compressedBase64;
       await apiUpdateSetting({ catImgs: catImgs });
       renderAdminCats();
-    };
-    r.readAsDataURL(f);
+    });
   };
   input.click();
 }
@@ -355,9 +416,10 @@ function closeSlideModal() { document.getElementById('slideModal').classList.rem
 function handleSlideImg(e) {
   const f = e.target.files[0];
   if (!f) return;
-  const r = new FileReader();
-  r.onload = ev => { tempSlideImg = ev.target.result; document.getElementById('sCurImg').innerHTML = `<img src="${tempSlideImg}" style="width:100%;height:100px;object-fit:cover">`; };
-  r.readAsDataURL(f);
+  compressImage(f, (compressedBase64) => {
+    tempSlideImg = compressedBase64; 
+    document.getElementById('sCurImg').innerHTML = `<img src="${tempSlideImg}" style="width:100%;height:100px;object-fit:cover">`;
+  });
 }
 async function saveSlide() {
   const data = {

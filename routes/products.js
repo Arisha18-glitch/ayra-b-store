@@ -55,7 +55,9 @@ router.post('/', async function (req, res) {
       reviews: parseInt(body.reviews, 10) || 0,
       desc: sanitizeString(body.desc || ''),
       features: Array.isArray(body.features) ? body.features.map(sanitizeString) : [],
-      meta: body.meta || {}
+      meta: body.meta || {},
+      stock: parseInt(body.stock, 10) || 0,
+      variants: Array.isArray(body.variants) ? body.variants : []
     });
     var saved = await product.save();
     res.status(201).json({ success: true, data: saved });
@@ -81,6 +83,8 @@ router.put('/:id', async function (req, res) {
     if (body.desc !== undefined) updates.desc = sanitizeString(body.desc);
     if (body.features !== undefined) updates.features = Array.isArray(body.features) ? body.features.map(sanitizeString) : [];
     if (body.meta !== undefined) updates.meta = body.meta;
+    if (body.stock !== undefined) updates.stock = parseInt(body.stock, 10) || 0;
+    if (body.variants !== undefined) updates.variants = Array.isArray(body.variants) ? body.variants : [];
 
     var product = await Product.findByIdAndUpdate(req.params.id, updates, {
       new: true,
