@@ -17,7 +17,8 @@ router.get('/', async function (req, res) {
     if (req.query.cat && req.query.cat !== 'All') {
       filter.cat = sanitizeString(req.query.cat);
     }
-    var products = await Product.find(filter).sort({ createdAt: -1 }).lean();
+    var products = await Product.find(filter).lean();
+    products.sort((a, b) => b.createdAt - a.createdAt);
     res.json({ success: true, data: products });
   } catch (err) {
     res.status(500).json({ success: false, error: 'Failed to retrieve products.' });
